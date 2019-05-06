@@ -10,9 +10,9 @@ describe PolicyManager::PortabilityRequest do
         c.from_email = "foo@bar.org"
         c.admin_email_inbox = "foo@baaz.org"
         c.add_rule({name: "age", validates_on: [:create, :update], if: ->(o){ o.enabled_for_validation } })
-        c.exporter = { 
-          path: Rails.root + "tmp/export", 
-          resource: User ,
+        c.exporter = {
+          path: Rails.root + "tmp/export",
+          resource: 'User' ,
           index_template: '
           <h1>index template, custom</h1>
                           <ul>
@@ -21,17 +21,17 @@ describe PolicyManager::PortabilityRequest do
                             <% end %>
                           </ul>',
           layout: 'portability_requests',
-          after_zip: ->(zip_path, resource){ 
-            puts "THIS IS GREAT #{zip_path} was zipped, now what ??" 
+          after_zip: ->(zip_path, resource){
+            puts "THIS IS GREAT #{zip_path} was zipped, now what ??"
           }
 
         }
 
         c.add_portability_rule({
-          name: "exportable_data", 
-          collection: :foo_data, 
-          template: "hello , here a collection will be 
-          rendered <%= @collection.to_json %> 
+          name: "exportable_data",
+          collection: :foo_data,
+          template: "hello , here a collection will be
+          rendered <%= @collection.to_json %>
           <%= will_paginate(@collection, renderer: PolicyManager::PaginatorRenderer) %>",
           per: 10
         })
@@ -43,9 +43,10 @@ describe PolicyManager::PortabilityRequest do
 
     it "user export will generate folder, layout, templates" do
 
-      User.any_instance.stubs(:enabled_for_validation).returns(false) 
-        User.any_instance.stubs(:foo_data).returns( (1..100).to_a) 
+      User.any_instance.stubs(:enabled_for_validation).returns(false)
+        User.any_instance.stubs(:foo_data).returns( (1..100).to_a)
           user = User.create(email: "a@a.cl")
+          FileUtils.rm_rf(Rails.root.join("tmp/export"))
           assert !user.errors.any?
           preq = user.portability_requests.create
           assert preq.pending?
@@ -61,10 +62,12 @@ describe PolicyManager::PortabilityRequest do
           names = paths.map{|o| File.basename(o) }
           arr = names - ["exportable_data", "index.html", "my_account", "my_account_from_template"]
           assert arr.empty?
+          
           noko = Nokogiri::HTML.parse( File.open(paths.first + "/index.html").read )
-          assert noko.css("h1").text == "layout header"
+
+          assert noko.css("h1:first").text == "layout header"
           assert noko.css("footer").text == "layout footer"
-    
+
           expect(preq.reload).to be_completed
 
           notification = ActionMailer::Base.deliveries.last
@@ -72,7 +75,7 @@ describe PolicyManager::PortabilityRequest do
 
           FileUtils.rm_rf(Rails.root.join("tmp/export/#{user.id}"))
           FileUtils.rm_rf(Rails.root.join("tmp/export/#{user.id}-out.zip"))
-    
+
     end
 
 end
