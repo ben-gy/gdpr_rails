@@ -1,6 +1,6 @@
 # Why did I fork this repo?
 
-In the original gem there are hard coded attribution links advertising the compamny of the team that created the repo. It wasn;t appropriate for me to display the attribution links in my company's product so I have removed them. I also have suggtestedd some improvements to the repository which I first deployed here but have since also been merged into the core repository
+In the original gem there are hard coded attribution links advertising the compamny of the team that created the repo. It wasn;t appropriate for me to display the attribution links in my company's product so I have removed them. I also have suggtestedd some improvements to the repository which I first deployed here but have since also been merged into the orginal repository.
 
 ---
 
